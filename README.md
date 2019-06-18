@@ -1,16 +1,18 @@
-# Luke's Auto-Rice Bootstraping Scripts (LARBS)
+# ArchDWM fork of Luke's Auto-Rice Bootstraping Scripts (LARBS)
 
+`This fork of the LARBS installer is for dwm on arch`
 
 ## Installation:
 
 On an Arch based distribution as root, run the following:
 
 ```
-curl -LO larbs.xyz/larbs.sh
+curl -LO https://raw.githubusercontent.com/ghomasHudson/LARBS/master/larbs.sh
 sh larbs.sh
 ```
 
 That's it.
+
 
 ## What is LARBS?
 
