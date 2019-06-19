@@ -16,7 +16,7 @@ esac done
 
 # DEFAULTS:
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/ghomasHudson/voidrice.git" && repobranch="archdwm"
-[ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/LukeSmithxyz/LARBS/master/archdwm/progs.csv"
+[ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/ghomasHudson/LARBS/master/archdwm/progs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
 [ -z "$repobranch" ] && repobranch="master"
 
