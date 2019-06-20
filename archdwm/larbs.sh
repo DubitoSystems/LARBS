@@ -189,6 +189,9 @@ getuserandpass || error "User exited."
 # Give warning if user already exists.
 usercheck || error "User exited."
 
+# Get cretentials for private git repos
+getcredentialsforgit
+
 # Last chance for user to back out before install.
 preinstallmsg || error "User exited."
 
