@@ -106,7 +106,7 @@ gitmakeinstall() {
 		send \"$gpass1\r\"
 		expect eof
 		" >/dev/null 2>&1
-	cd "/home/$name/Repos/$(basename ${i%.*}" || exit
+                cd "/home/$name/Repos/".$(basename ${i%.*}) || exit
 	make >/dev/null 2>&1
 	make install >/dev/null 2>&1
 	cd /tmp || return ;}
