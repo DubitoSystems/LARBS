@@ -18,7 +18,7 @@ esac done
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/ghomasHudson/voidrice.git" && repobranch="archdwm"
 [ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/ghomasHudson/LARBS/master/archdwm/progs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
-[ -z "$repobranch" ] && repobranch="arbash ait for "
+[ -z "$repobranch" ] && repobranch="archdwm"
 
 ### FUNCTIONS ###
 
