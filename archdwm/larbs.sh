@@ -96,17 +96,17 @@ maininstall() { # Installs all needed programs from main repo.
 	}
 
 gitmakeinstall() {
-	dir=$(mktemp -d)
+	mkdir -p "/home/$name/Repos"
 	dialog --title "LARBS Installation" --infobox "Installing \`$(basename "$1")\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 5 70
         expect -c "
-		spawn git clone --depth 1 \"$1\" \"$dir\"
+		spawn git -C \"/home/$name/Repos\" clone --depth 1 \"$1\"
 		expect \"Username*\"
 		send \"$glogin\r\"
 		expect \"Password*\"
 		send \"$gpass1\r\"
 		expect eof
 		" >/dev/null 2>&1
-	cd "$dir" || exit
+	cd "/home/$name/Repos/$1" || exit
 	make >/dev/null 2>&1
 	make install >/dev/null 2>&1
 	cd /tmp || return ;}
