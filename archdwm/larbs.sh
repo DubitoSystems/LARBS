@@ -18,7 +18,7 @@ esac done
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/ghomasHudson/voidrice.git" && repobranch="archdwm"
 [ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/ghomasHudson/LARBS/master/archdwm/progs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
-[ -z "$repobranch" ] && repobranch="master"
+[ -z "$repobranch" ] && repobranch="arbash ait for "
 
 ### FUNCTIONS ###
 
@@ -145,7 +145,7 @@ putgitrepo() { # Downlods a gitrepo $1 and places the files in $2 only overwriti
 	[ ! -d "$2" ] && mkdir -p "$2" && chown -R "$name:wheel" "$2"
 	chown -R "$name:wheel" "$dir"
  	expect -c "
-		spawn sudo -u \"$name\" git clone --depth 1 \"$1\" \"$dir/gitrepo\"
+		spawn sudo -u \"$name\" git clone -b $branch --depth 1 \"$1\" \"$dir/gitrepo\"
 		expect \"Username*\"
 		send \"$glogin\r\"
 		expect \"Password*\"
@@ -170,8 +170,6 @@ resetpulse() { dialog --infobox "Reseting Pulseaudio..." 4 50
 	sudo -n "$name" pulseaudio --start ;}
 
 finalize(){ \
-	dialog --infobox "Preparing welcome message..." 4 50
-	echo "exec_always --no-startup-id notify-send -i ~/.local/share/larbs/larbs.png 'Welcome to LARBS:' 'Press Super+F1 for the manual.' -t 10000"  >> "/home/$name/.config/i3/config"
 	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
 	}
 
