@@ -53,6 +53,9 @@ getcredentialsforgit() { \
 		gpass2=$(dialog --no-cancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
 	done ;}
 
+installorupdate() { \
+    dialog --colors --title "Install or just Update" --yes-label "Install" --no-label "Update" --yesno "Pick whether you want the script to Install LARBS fresh or update the packages on a new system" 14 70
+    }
 usercheck() { \
 	! (id -u "$name" >/dev/null) 2>&1 ||
 	dialog --colors --title "WARNING!" --yes-label "CONTINUE" --no-label "No wait..." --yesno "The user \`$name\` already exists on this system. LARBS can install for a user already existing, but it will \\Zboverwrite\\Zn any conflicting settings/dotfiles on the user account.\\n\\nLARBS will \\Zbnot\\Zn overwrite your user files, documents, videos, etc., so don't worry about that, but only click <CONTINUE> if you don't mind your settings being overwritten.\\n\\nNote also that LARBS will change $name's password to the one you just gave." 14 70
@@ -178,29 +181,34 @@ finalize(){ \
 ### This is how everything happens in an intuitive format and order.
 
 # Check if user is root on Arch distro. Install dialog.
-pacman -Syu --noconfirm --needed dialog ||  error "Are you sure you're running this as the root user? Are you sure you're using an Arch-based distro? ;-) Are you sure you have an internet connection? Are you sure your Arch keyring is updated?"
+#pacman -Syu --noconfirm --needed dialog ||  error "Are you sure you're running this as the root user? Are you sure you're using an Arch-based distro? ;-) Are you sure you have an internet connection? Are you sure your Arch keyring is updated?"
 
 # Welcome user.
 welcomemsg || error "User exited."
 
-# Get and verify username and password.
-getuserandpass || error "User exited."
+#Check whether to install or just update existing.
+update=0
+installorupdate || update=1
+if [ $update -eq 0 ]; then
+    # Get and verify username and password.
+    getuserandpass || error "User exited."
 
-# Give warning if user already exists.
-usercheck || error "User exited."
+    # Give warning if user already exists.
+    usercheck || error "User exited."
 
-# Get cretentials for private git repos
-getcredentialsforgit
+    # Get cretentials for private git repos
+    getcredentialsforgit
 
-# Last chance for user to back out before install.
-preinstallmsg || error "User exited."
+    # Last chance for user to back out before install.
+    preinstallmsg || error "User exited."
 
-### The rest of the script requires no user input.
+    ### The rest of the script requires no user input.
 
-adduserandpass || error "Error adding username and/or password."
+    adduserandpass || error "Error adding username and/or password."
 
-# Refresh Arch keyrings.
-refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
+    # Refresh Arch keyrings.
+    refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
+fi
 
 dialog --title "LARBS Installation" --infobox "Installing \`basedevel\` , \`git\` and \`expect\` for installing other software." 5 70
 pacman --noconfirm --needed -S base-devel git expect >/dev/null 2>&1
