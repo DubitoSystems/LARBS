@@ -238,7 +238,7 @@ if [ $update -eq 0 ]; then
     manualinstall $aurhelper || error "Failed to install AUR helper."
 
 else
-    getuser() || error "User exited."
+    getuser || error "User exited."
 fi
 
 
