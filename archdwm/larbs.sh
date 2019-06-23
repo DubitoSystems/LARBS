@@ -43,8 +43,7 @@ getuserandpass() { \
         done ;}
 
 getuser() { \
-	name=$(dialog --inputbox "First, please enter the name for your main user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit
-        ;}
+	name=$(dialog --inputbox "First, please enter the name for your main user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit;}
 
 getcredentialsforgit() { \
 	# Prompts user for username an password to github.
