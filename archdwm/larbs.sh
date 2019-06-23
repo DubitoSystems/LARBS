@@ -42,6 +42,9 @@ getuserandpass() { \
 		pass2=$(dialog --no-cancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
 	done ;}
 
+getuser() { \
+	name=$(dialog --inputbox "First, please enter the name for your main user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit
+        done ;}
 getcredentialsforgit() { \
 	# Prompts user for username an password to github.
 	glogin=$(dialog --inputbox "If there are any private repositories in your progs.csv, please provide GitHub credentials for Git Clone\\nOtherwise just confirm without any input" 10 60 3>&1 1>&2 2>&3 3>&1) || exit
@@ -189,8 +192,6 @@ finalize(){ \
 # Welcome user.
 welcomemsg || error "User exited."
 
-# Get and verify username and password.
-getuserandpass || error "User exited."
 
 reposdir="/home/$name/Repos/"
 
@@ -200,11 +201,15 @@ installorupdate || update=0
 
 if [ $update -eq 0 ]; then
     # **Full install**
+
+    # Get and verify username and password.
+    getuserandpass || error "User exited."
+
     # Give warning if user already exists.
     usercheck || error "User exited."
 
     # Get cretentials for private git repos
-    getcredentialsforgit
+    getcredentialsforgit || error "User exited."
 
     # Last chance for user to back out before install.
     preinstallmsg || error "User exited."
@@ -214,24 +219,28 @@ if [ $update -eq 0 ]; then
 
     # Refresh Arch keyrings.
     refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
+
+    dialog --title "LARBS Installation" --infobox "Installing \`basedevel\` , \`git\` and \`expect\` for installing other software." 5 70
+    pacman --noconfirm --needed -S base-devel git expect >/dev/null 2>&1
+    [ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers # Just in case
+
+    # Allow user to run sudo without password. Since AUR programs must be installed
+    # in a fakeroot environment, this is required for all builds with AUR.
+    newperms "%wheel ALL=(ALL) NOPASSWD: ALL"
+
+    # Make pacman and yay colorful and adds eye candy on the progress bar because why not.
+    grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color/Color/" /etc/pacman.conf
+    grep "ILoveCandy" /etc/pacman.conf >/dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
+
+    # Use all cores for compilation.
+    sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
+
+    manualinstall $aurhelper || error "Failed to install AUR helper."
+
+else
+    getuser() || error "User exited."
 fi
 
-dialog --title "LARBS Installation" --infobox "Installing \`basedevel\` , \`git\` and \`expect\` for installing other software." 5 70
-pacman --noconfirm --needed -S base-devel git expect >/dev/null 2>&1
-[ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers # Just in case
-
-# Allow user to run sudo without password. Since AUR programs must be installed
-# in a fakeroot environment, this is required for all builds with AUR.
-newperms "%wheel ALL=(ALL) NOPASSWD: ALL"
-
-# Make pacman and yay colorful and adds eye candy on the progress bar because why not.
-grep "^Color" /etc/pacman.conf >/dev/null || sed -i "s/^#Color/Color/" /etc/pacman.conf
-grep "ILoveCandy" /etc/pacman.conf >/dev/null || sed -i "/#VerbosePkgLists/a ILoveCandy" /etc/pacman.conf
-
-# Use all cores for compilation.
-sed -i "s/-j2/-j$(nproc)/;s/^#MAKEFLAGS/MAKEFLAGS/" /etc/makepkg.conf
-
-manualinstall $aurhelper || error "Failed to install AUR helper."
 
 # The command that does all the installing. Reads the progs.csv file and
 # installs each needed program the way required. Be sure to run this only after
