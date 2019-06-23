@@ -40,11 +40,12 @@ getuserandpass() { \
 		unset pass2
 		pass1=$(dialog --no-cancel --passwordbox "Passwords do not match.\\n\\nEnter password again." 10 60 3>&1 1>&2 2>&3 3>&1)
 		pass2=$(dialog --no-cancel --passwordbox "Retype password." 10 60 3>&1 1>&2 2>&3 3>&1)
-	done ;}
+        done ;}
 
 getuser() { \
 	name=$(dialog --inputbox "First, please enter the name for your main user account." 10 60 3>&1 1>&2 2>&3 3>&1) || exit
-        done ;}
+        ;}
+
 getcredentialsforgit() { \
 	# Prompts user for username an password to github.
 	glogin=$(dialog --inputbox "If there are any private repositories in your progs.csv, please provide GitHub credentials for Git Clone\\nOtherwise just confirm without any input" 10 60 3>&1 1>&2 2>&3 3>&1) || exit
