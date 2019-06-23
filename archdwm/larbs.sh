@@ -54,7 +54,7 @@ getcredentialsforgit() { \
 	done ;}
 
 installorupdate() { \
-    dialog --colors --title "Install or just Update" --yes-label "Install" --no-label "Update" --yesno "Pick whether you want the script to Install LARBS fresh or update the packages on a new system" 14 70
+    dialog --colors --title "Install or just Update" --yes-label "Update" --no-label "Install" --yesno "Pick whether you want the script to Install LARBS fresh or update the packages on an existing system" 14 70
     }
 usercheck() { \
 	! (id -u "$name" >/dev/null) 2>&1 ||
@@ -195,8 +195,8 @@ getuserandpass || error "User exited."
 reposdir="/home/$name/Repos/"
 
 #Check whether to install or just update existing.
-update=0
-installorupdate || update=1
+update=1
+installorupdate || update=0
 
 if [ $update -eq 0 ]; then
     # **Full install**
