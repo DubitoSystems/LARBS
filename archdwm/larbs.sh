@@ -99,17 +99,20 @@ maininstall() { # Installs all needed programs from main repo.
 	}
 
 gitmakeinstall() {
-	mkdir -p "/home/$name/Repos"
+	mkdir -p $reposdir
 	dialog --title "LARBS Installation" --infobox "Installing \`$(basename "$1")\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 5 70
-        expect -c "
-		spawn git -C \"/home/$name/Repos\" clone --depth 1 \"$1\"
-		expect \"Username*\"
-		send \"$glogin\r\"
-		expect \"Password*\"
-		send \"$gpass1\r\"
-		expect eof
-		" >/dev/null 2>&1
-                cd "/home/$name/Repos/".$(basename ${i%.*}) || exit
+        pathtorepo="$reposdir".$(basename ${i%.*})
+        if [ ! -d "$pathtorepo" ]; then
+            expect -c "
+                spawn git -C \"$reposdir\" clone --depth 1 \"$1\"
+                expect \"Username*\"
+                send \"$glogin\r\"
+                expect \"Password*\"
+                send \"$gpass1\r\"
+                expect eof
+                " >/dev/null 2>&1
+        fi
+        cd $pathtorepo || exit
 	make >/dev/null 2>&1
 	make install >/dev/null 2>&1
 	cd /tmp || return ;}
@@ -186,13 +189,17 @@ finalize(){ \
 # Welcome user.
 welcomemsg || error "User exited."
 
+# Get and verify username and password.
+getuserandpass || error "User exited."
+
+reposdir="/home/$name/Repos/"
+
 #Check whether to install or just update existing.
 update=0
 installorupdate || update=1
-if [ $update -eq 0 ]; then
-    # Get and verify username and password.
-    getuserandpass || error "User exited."
 
+if [ $update -eq 0 ]; then
+    # **Full install**
     # Give warning if user already exists.
     usercheck || error "User exited."
 
@@ -203,7 +210,6 @@ if [ $update -eq 0 ]; then
     preinstallmsg || error "User exited."
 
     ### The rest of the script requires no user input.
-
     adduserandpass || error "Error adding username and/or password."
 
     # Refresh Arch keyrings.
@@ -234,14 +240,16 @@ manualinstall $aurhelper || error "Failed to install AUR helper."
 installationloop
 
 # Install the dotfiles in the user's home directory
-putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
-rm -f "/home/$name/README.md" "/home/$name/LICENSE"
+if [ $update -eq 0 ]; then
+    putgitrepo "$dotfilesrepo" "/home/$name" "$repobranch"
+    rm -f "/home/$name/README.md" "/home/$name/LICENSE"
 
-# Install the LARBS Firefox profile in ~/.mozilla/firefox/
-putgitrepo "https://github.com/LukeSmithxyz/mozillarbs.git" "/home/$name/.mozilla/firefox"
+    # Install the LARBS Firefox profile in ~/.mozilla/firefox/
+    putgitrepo "https://github.com/LukeSmithxyz/mozillarbs.git" "/home/$name/.mozilla/firefox"
 
-# Pulseaudio, if/when initially installed, often needs a restart to work immediately.
-[ -f /usr/bin/pulseaudio ] && resetpulse
+    # Pulseaudio, if/when initially installed, often needs a restart to work immediately.
+    [ -f /usr/bin/pulseaudio ] && resetpulse 
+fi
 
 # Enable services here.
 serviceinit NetworkManager cronie
