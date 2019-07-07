@@ -2,7 +2,7 @@
 ,xorg-server,"is the graphical server."
 ,xorg-xwininfo,"allows querying information about windows."
 ,xorg-xinit,"starts the graphical server."
-,sxhkd,"binds key.",
+,sxhkd,"binds key."
 ,ttf-inconsolata,"is the monospace font of LARBS"
 ,ttf-linux-libertine,"provides the sans and serif fonts for LARBS."
 ,ttf-font-awesome,"provides special characters used in the status bar and elsewhere."
