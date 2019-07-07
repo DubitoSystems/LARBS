@@ -24,6 +24,12 @@ That's it.
 	- Init a new password-store subdir with: `pass init -p mutt [GPG KEY ID]`
 	- Mail should now sync with `mbsync -a`
 
+## My Added functionality
+- Ported dwm program list to arch
+- Option for fresh install or just install new packages.
+- Support for private git repos (for dotfiles and some suckless configs)
+- Store all repos from git in ~/Repos
+
 _______________________________________
 
 ## What is LARBS?
