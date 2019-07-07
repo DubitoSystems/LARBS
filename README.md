@@ -24,6 +24,8 @@ That's it.
 	- Init a new password-store subdir with: `pass init -p mutt [GPG KEY ID]`
 	- Mail should now sync with `mbsync -a`
 
+_______________________________________
+
 ## What is LARBS?
 
 LARBS is a script that autoinstalls and autoconfigures a fully-functioning
