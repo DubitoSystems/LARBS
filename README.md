@@ -13,6 +13,16 @@ sh larbs.sh
 
 That's it.
 
+## Post installation checklist
+- [ ] Get password store
+	- SCP main GPG key from other machine (ending ...BAD5F)
+	- [Add key to GPG agent](https://unix.stackexchange.com/questions/184947/how-to-import-secret-gpg-key-copied-from-one-machine-to-another): `gpg --import private.key`
+	- Clone [pass repo](https://github.com/ghomasHudson/pass) to `.local/share/password-store`
+	- Passwords should be visible with `pass [NAME OF WEBSITE]`
+- [ ] Get email working with mbsync. 
+	- [Create a new GPG key](https://help.github.com/en/articles/generating-a-new-gpg-key]) (different from main key) without a password: `gpg --full-generate-key`. This is so `mbsync -a` can be run as a cronjob.
+	- Init a new password-store subdir with: `pass init -p mutt [GPG KEY ID]`
+	- Mail should now sync with `mbsync -a`
 
 ## What is LARBS?
 
