@@ -18,14 +18,14 @@ esac done
 [ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/ghomasHudson/dotfiles.git" && repobranch="archdwm"
 [ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/ghomasHudson/LARBS/master/archdwm/progs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
-[ -z "$repobranch" ] && repobranch="archdwm"
+[ -z "$repobranch" ] && repobranch="master"
 
 ### FUNCTIONS ###
 
 error() { clear; printf "ERROR:\\n%s\\n" "$1"; exit;}
 
 welcomemsg() { \
-	dialog --title "Welcome!" --msgbox "Welcome to Luke's Auto-Rice Bootstrapping Script!\\n\\nThis script will automatically install a fully-featured dwm Arch Linux desktop, which I use as my main machine.\\n\\n-Luke" 10 60
+	dialog --title "Welcome!" --msgbox "Welcome to the Auto-Rice Bootstrapping Script!\\n\\nThis script will automatically install a fully-featured dwm Arch Linux desktop, which I use as my main machine.\\n\\n-Luke" 10 60
 	}
 
 getuserandpass() { \
@@ -57,11 +57,11 @@ getcredentialsforgit() { \
 	done ;}
 
 installorupdate() { \
-    dialog --colors --title "Install or just Update" --yes-label "Update" --no-label "Install" --yesno "Pick whether you want the script to Install LARBS fresh or update the packages on an existing system" 14 70
+    dialog --colors --title "Install or just Update" --yes-label "Update" --no-label "Install" --yesno "Pick whether you want the script to Install from fresh or update the packages on an existing system" 14 70
     }
 usercheck() { \
 	! (id -u "$name" >/dev/null) 2>&1 ||
-	dialog --colors --title "WARNING!" --yes-label "CONTINUE" --no-label "No wait..." --yesno "The user \`$name\` already exists on this system. LARBS can install for a user already existing, but it will \\Zboverwrite\\Zn any conflicting settings/dotfiles on the user account.\\n\\nLARBS will \\Zbnot\\Zn overwrite your user files, documents, videos, etc., so don't worry about that, but only click <CONTINUE> if you don't mind your settings being overwritten.\\n\\nNote also that LARBS will change $name's password to the one you just gave." 14 70
+	dialog --colors --title "WARNING!" --yes-label "CONTINUE" --no-label "No wait..." --yesno "The user \`$name\` already exists on this system. We can install for a user already existing, but it will \\Zboverwrite\\Zn any conflicting settings/dotfiles on the user account.\\n\\nThis script will \\Zbnot\\Zn overwrite your user files, documents, videos, etc., so don't worry about that, but only click <CONTINUE> if you don't mind your settings being overwritten.\\n\\nNote also that the script will change $name's password to the one you just gave." 14 70
 	}
 
 preinstallmsg() { \
@@ -77,8 +77,7 @@ adduserandpass() { \
 	unset pass1 pass2 ;}
 
 refreshkeys() { \
-	dialog --infobox "Refreshing Arch Keyring..." 4 40
-	pacman --noconfirm -Sy archlinux-keyring >/dev/null 2>&1
+	pacman --noconfirm -Sy archlinux-keyring
 	}
 
 newperms() { # Set special sudoers settings for install (or after).
@@ -87,48 +86,49 @@ newperms() { # Set special sudoers settings for install (or after).
 
 manualinstall() { # Installs $1 manually if not installed. Used only for AUR helper here.
 	[ -f "/usr/bin/$1" ] || (
-	dialog --infobox "Installing \"$1\", an AUR helper..." 4 50
+	echo "Installing \"$1\", an AUR helper..."
 	cd /tmp || exit
 	rm -rf /tmp/"$1"*
 	curl -sO https://aur.archlinux.org/cgit/aur.git/snapshot/"$1".tar.gz &&
-	sudo -u "$name" tar -xvf "$1".tar.gz >/dev/null 2>&1 &&
+	sudo -u "$name" tar -xvf "$1".tar.gz
 	cd "$1" &&
-	sudo -u "$name" makepkg --noconfirm -si >/dev/null 2>&1
+	sudo -u "$name" makepkg --noconfirm -si
 	cd /tmp || return) ;}
 
 maininstall() { # Installs all needed programs from main repo.
-	dialog --title "LARBS Installation" --infobox "Installing \`$1\` ($n of $total). $1 $2" 5 70
-	pacman --noconfirm --needed -S "$1" >/dev/null 2>&1
+	echo "Installing \`$1\` ($n of $total). $1 $2"
+	pacman --noconfirm --needed -S "$1"
 	}
 
 gitmakeinstall() {
 	mkdir -p $reposdir
-	dialog --title "LARBS Installation" --infobox "Installing \`$(basename "$1")\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2" 5 70
-        pathtorepo="$reposdir".$(basename ${i%.*})
+	chown $name $reposdir
+	echo "Installing \`$(basename "$1")\` ($n of $total) via \`git\` and \`make\`. $(basename "$1") $2"
+	pathtorepo="$reposdir""$(basename $1)"
         if [ ! -d "$pathtorepo" ]; then
             expect -c "
-                spawn git -C \"$reposdir\" clone --depth 1 \"$1\"
+                spawn sudo -u $name git -C \"$reposdir\" clone --depth 1 \"$1\"
                 expect \"Username*\"
                 send \"$glogin\r\"
                 expect \"Password*\"
                 send \"$gpass1\r\"
                 expect eof
-                " >/dev/null 2>&1
+                "
         fi
-        cd $pathtorepo || exit
-	make >/dev/null 2>&1
-	make install >/dev/null 2>&1
+        cd $pathtorepo
+	make
+	make install
 	cd /tmp || return ;}
 
 aurinstall() { \
-	dialog --title "LARBS Installation" --infobox "Installing \`$1\` ($n of $total) from the AUR. $1 $2" 5 70
-	echo "$aurinstalled" | grep "^$1$" >/dev/null 2>&1 && return
-	sudo -u "$name" $aurhelper -S --noconfirm "$1" >/dev/null 2>&1
+	echo "Installing \`$1\` ($n of $total) from the AUR. $1 $2"
+	echo "$aurinstalled" | grep "^$1$"
+	sudo -u "$name" $aurhelper -S --noconfirm "$1"
 	}
 
 pipinstall() { \
-	dialog --title "LARBS Installation" --infobox "Installing the Python package \`$1\` ($n of $total). $1 $2" 5 70
-	command -v pip || pacman -S --noconfirm --needed python-pip >/dev/null 2>&1
+	echo "Installing the Python package \`$1\` ($n of $total). $1 $2"
+	command -v pip || pacman -S --noconfirm --needed python-pip
 	yes | pip install "$1"
 	}
 
@@ -148,7 +148,7 @@ installationloop() { \
 	done < /tmp/progs.csv ;}
 
 putgitrepo() { # Downlods a gitrepo $1 and places the files in $2 only overwriting conflicts
-	dialog --infobox "Downloading and installing config files..." 4 60
+	echo "Downloading and installing config files..."
 	[ -z "$3" ] && branch="master" || branch="$repobranch"
 	dir=$(mktemp -d)
 	[ ! -d "$2" ] && mkdir -p "$2" && chown -R "$name:wheel" "$2"
@@ -160,17 +160,18 @@ putgitrepo() { # Downlods a gitrepo $1 and places the files in $2 only overwriti
 		expect \"Password*\"
 		send \"$gpass1\r\"
 		expect eof
-		" >/dev/null 2>&1
+		"
 	sudo -u "$name" cp -rfT "$dir/gitrepo" "$2"
 	}
 
 serviceinit() { for service in "$@"; do
-	dialog --infobox "Enabling \"$service\"..." 4 40
+	echo "Enabling \"$service\"..."
 	systemctl enable "$service"
 	systemctl start "$service"
 	done ;}
 
-systembeepoff() { dialog --infobox "Getting rid of that retarded error beep sound..." 10 50
+systembeepoff() {
+	echo "Getting rid of that retarded error beep sound..."
 	rmmod pcspkr
 	echo "blacklist pcspkr" > /etc/modprobe.d/nobeep.conf ;}
 
@@ -179,7 +180,8 @@ resetpulse() { dialog --infobox "Reseting Pulseaudio..." 4 50
 	sudo -n "$name" pulseaudio --start ;}
 
 finalize(){ \
-	dialog --title "All done!" --msgbox "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1).\\n\\n.t Luke" 12 80
+	echo "Congrats! Provided there were no hidden errors, the script completed successfully and all the programs and configuration files should be in place.\\n\\nTo run the new graphical environment, log out and log back in as your new user, then run the command \"startx\" to start the graphical environment (it will start automatically in tty1)."
+	echo "Done"
 	}
 
 ### THE ACTUAL SCRIPT ###
@@ -193,7 +195,6 @@ pacman -Syu --noconfirm --needed dialog expect ||  error "Are you sure you're ru
 welcomemsg || error "User exited."
 
 
-reposdir="/home/$name/Repos/"
 
 #Check whether to install or just update existing.
 update=1
@@ -203,7 +204,7 @@ if [ $update -eq 0 ]; then
     # **Full install**
 
     # Get and verify username and password.
-    getuserandpass || error "User exited."
+    getuserandpass || error "User exited"
 
     # Give warning if user already exists.
     usercheck || error "User exited."
@@ -216,12 +217,13 @@ if [ $update -eq 0 ]; then
 
     ### The rest of the script requires no user input.
     adduserandpass || error "Error adding username and/or password."
+    reposdir="/home/$name/Repos/"
 
     # Refresh Arch keyrings.
     refreshkeys || error "Error automatically refreshing Arch keyring. Consider doing so manually."
 
     dialog --title "LARBS Installation" --infobox "Installing \`basedevel\` , \`git\` and \`expect\` for installing other software." 5 70
-    pacman --noconfirm --needed -S base-devel git expect >/dev/null 2>&1
+    pacman --noconfirm --needed -S base-devel git expect
     [ -f /etc/sudoers.pacnew ] && cp /etc/sudoers.pacnew /etc/sudoers # Just in case
 
     # Allow user to run sudo without password. Since AUR programs must be installed
@@ -261,10 +263,13 @@ if [ $update -eq 0 ]; then
 fi
 
 # Enable services here.
-serviceinit NetworkManager cronie
+serviceinit cronie sshd
 
 # Most important command! Get rid of the beep!
 systembeepoff
+
+#Set the uk keymap for X11
+localectl set-x11-keymap gb
 
 # This line, overwriting the `newperms` command above will allow the user to run
 # serveral important commands, `shutdown`, `reboot`, updating, etc. without a password.
@@ -273,4 +278,3 @@ newperms "%wheel ALL=(ALL) ALL #LARBS
 
 # Last message! Install complete!
 finalize
-clear
