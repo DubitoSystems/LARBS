@@ -23,6 +23,8 @@ That's it.
 - [ ] Get email working with mbsync. 
 	- [Create a new GPG key](https://help.github.com/en/articles/generating-a-new-gpg-key]) (different from main key) without a password: `gpg --full-generate-key`. This is so `mbsync -a` can be run as a cronjob.
 	- Init a new password-store subdir with: `pass init -p mutt [GPG KEY ID]`
+	- Create passwords for accounts under mutt:
+		- `pass insert mutt/durham`... 
 	- Mail should now sync with `mbsync -a`
 
 ## My Added functionality
