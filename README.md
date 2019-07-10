@@ -29,6 +29,7 @@ That's it.
 	- Run `mw cron` to setup the cronjob.
 
 ## My Added functionality
+- Removed dialog stuff so you can actually see the errors!
 - Ported dwm program list to arch
 - Option for fresh install or just install new packages.
 - Support for private git repos (for dotfiles and some suckless configs)
