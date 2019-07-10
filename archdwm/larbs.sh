@@ -15,7 +15,7 @@ while getopts ":a:r:b:p:h" o; do case "${o}" in
 esac done
 
 # DEFAULTS:
-[ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/ghomasHudson/voidrice.git" && repobranch="archdwm"
+[ -z "$dotfilesrepo" ] && dotfilesrepo="https://github.com/ghomasHudson/dotfiles.git" && repobranch="archdwm"
 [ -z "$progsfile" ] && progsfile="https://raw.githubusercontent.com/ghomasHudson/LARBS/master/archdwm/progs.csv"
 [ -z "$aurhelper" ] && aurhelper="yay"
 [ -z "$repobranch" ] && repobranch="archdwm"
@@ -187,7 +187,7 @@ finalize(){ \
 ### This is how everything happens in an intuitive format and order.
 
 # Check if user is root on Arch distro. Install dialog.
-pacman -Syu --noconfirm --needed dialog spawn ||  error "Are you sure you're running this as the root user? Are you sure you're using an Arch-based distro? ;-) Are you sure you have an internet connection? Are you sure your Arch keyring is updated?"
+pacman -Syu --noconfirm --needed dialog expect ||  error "Are you sure you're running this as the root user? Are you sure you're using an Arch-based distro? ;-) Are you sure you have an internet connection? Are you sure your Arch keyring is updated?"
 
 # Welcome user.
 welcomemsg || error "User exited."
